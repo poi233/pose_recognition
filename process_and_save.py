@@ -25,7 +25,7 @@ input_node = tf.placeholder(tf.float32, shape=(1, input_height, input_width, 3),
 video_base = './video'
 result_base = './result'
 # get video names
-videos = ['example_1.MOV']
+videos = []
 # read network
 sess = tf.Session()
 
@@ -87,7 +87,7 @@ def save_action_time(video_name, human_thetas, smooth_rate=0.1, threshold=0.1):
         file_object.close()
 
 
-def save_figures(video_name, human_thetas, oriented=None, smooth_rate=0.15):
+def save_figures(video_name, human_thetas, oriented=None, smooth_rate=0.1):
     if oriented is None:
         return
     else:
@@ -284,7 +284,7 @@ def get_predicted_imgs_and_thetas(imgs, trace_person):
     return predicted_img, human_thetas, human_tmp, trace_human_id
 
 
-def process_video(video_name, oriented=common.CalDegree, trace_person=None, smooth_rate=0.15):
+def process_video(video_name, oriented=common.CalDegree, trace_person=None, smooth_rate=0.1):
     print('start processing {}'.format(video_name))
     predicted_img, human_thetas, human, trace_person_id = get_predicted_imgs_and_thetas(
         utils.get_images('{}.MOV'.format(video_name)), trace_person)

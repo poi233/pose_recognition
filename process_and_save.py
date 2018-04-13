@@ -61,7 +61,7 @@ def save_images(video_name, predicted_img):
 def save_action_time(video_name, human_thetas, smooth_rate=0.1, threshold=0.1):
     # set json save path
     oriented = ['theta_8_1_11', 'avg']
-    transfer_dict = {'avg': 'stand', 'theta_8_1_11': 'turnback'}
+    transfer_dict = {'avg': 'tug', 'theta_8_1_11': 'tt'}
     result_path = os.path.join(result_base, '{}_result'.format(video_name))
     if not os.path.exists(result_path):
         os.makedirs(result_path)
@@ -70,7 +70,8 @@ def save_action_time(video_name, human_thetas, smooth_rate=0.1, threshold=0.1):
         os.makedirs(path)
     # draw figure and save
     for human_id, data in human_thetas.items():
-        time = {}
+        time = dict()
+        time['videoName'] = video_name
         for key, value in data.items():
             if key in oriented:
                 time[transfer_dict[key]] = []

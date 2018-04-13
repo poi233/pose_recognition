@@ -328,16 +328,22 @@ def get_action_time(over, key):
         elif over[i - 1] is not None and over[i] is None:
             end = i
             if end > start:
-                if key == 'avg' and sum(over[start:end])/(end-start) < 0:
+                if key == 'tug' and sum(over[start:end]) / (end - start) < 0:
                     continue
                 else:
-                    time.append(((end-start)/30.0, start, end))
+                    time.append((round((end - start) / 30.0, 3), start, end))
                 start = 0
                 end = -1
 
         if i == len(over) - 1 and start != 0:
-            time.append(((len(over) - start)/30.0, start, len(over)))
-    return time
+            time.append((round((len(over) - start) / 30.0, 3), start, len(over)))
+    max = 0
+    max_id = -1
+    for i in range(0, len(time)):
+        if time[i][0] > max:
+            max_id = i
+    action_time = "{},{},{}".format(time[max_id][0], time[max_id][1], time[max_id][2])
+    return action_time
 
 # # set base paths
 # video_base = './video'

@@ -26,6 +26,9 @@ video_base = './video'
 result_base = './result'
 # get video names
 videos = []
+for f in os.listdir(video_base):
+    videos.append(f)
+print(videos)
 # read network
 sess = tf.Session()
 
@@ -198,7 +201,7 @@ def get_predicted_imgs_and_thetas(imgs, trace_person):
             # 使用处理过的预测数据在前一帧的基础上为每一个人添加内容
             for human_id, human_list in human_tmp.items():
                 human = None
-                # 寻找最后一个最近的非None的数据，如果最近10个数据均是None，则删除对应键
+                # 寻找最后一个最近的非None的数据
                 for former_human in human_list[::-1]:
                     if former_human is not None:
                         human = former_human
@@ -225,17 +228,21 @@ def get_predicted_imgs_and_thetas(imgs, trace_person):
                     for processed_human in processed_humans:
                         neck_distance = analyse.get_distance(analyse.get_point(processed_human, 1),
                                                              analyse.get_point(human, 1))
-                        if former_human_count < present_human_count:
-                            if neck_distance < min_distance and neck_distance < radius:
+                        if radius != -1:
+                            if neck_distance < min_distance and neck_distance < 0.1:
                                 to_add = processed_human
                                 min_distance = neck_distance
-                        else:
-                            if neck_distance < min_distance:
-                                to_add = processed_human
-                                min_distance = neck_distance
-                    human_tmp[human_id].append(to_add)
+                        # if former_human_count < present_human_count:
+                        #     if neck_distance < min_distance and neck_distance < radius:
+                        #         to_add = processed_human
+                        #         min_distance = neck_distance
+                        # else:
+                        #     if neck_distance < min_distance:
+                        #         to_add = processed_human
+                        #         min_distance = neck_distance
                     if to_add is not None:
                         processed_humans.remove(to_add)
+                    human_tmp[human_id].append(to_add)
                     # 添加角度数据
                     theta_dict = analyse.cal_degrees(to_add)
                     for key in common.CalDegree:
@@ -245,10 +252,10 @@ def get_predicted_imgs_and_thetas(imgs, trace_person):
                             human_thetas[human_id][key].append(theta_dict[key])
                         else:
                             human_thetas[human_id][key].append(None)
-                else:
-                    human_tmp.pop(human_id)
-                    human_thetas.pop(human_id)
-                    continue
+                # else:
+                #     human_tmp.pop(human_id)
+                #     human_thetas.pop(human_id)
+                #     continue
             # 如果有新的人物加入，在这里进行添加
             for residual_human in processed_humans:
                 new_id = max(human_tmp.keys()) + 1
@@ -300,7 +307,7 @@ def process_video(video_name, oriented=common.CalDegree, trace_person=None, smoo
             for i in data:
                 if i is not None:
                     not_none_count = not_none_count + 1
-            if not_none_count / total > 0.5:
+            if not_none_count / total > 0.1:
                 valid_num = valid_num + 1
         if valid_num / type_num < 0.5:
             human_to_delete.append(human_id)
@@ -320,7 +327,7 @@ def process_video(video_name, oriented=common.CalDegree, trace_person=None, smoo
         # 将处理好的数据存储为json文件
     save_json(video_name, human_thetas, 'human_thetas')
     # 将处理好的动作时间存储为json文件
-    save_action_time(video_name, human_thetas, smooth_rate=0.1, threshold=0.1)
+    save_action_time(video_name, human_thetas, smooth_rate=smooth_rate, threshold=0.07)
     # 存储每一张进行处理过的图片
     save_images(video_name, predicted_img)
     # 绘制并存储相关曲线

@@ -171,7 +171,7 @@ def get_dirivative(l):
     return dirivative_list
 
 
-def process_dirivative(smoothed_data, smooth_rate, threshold=0.1):
+def process_dirivative(smoothed_data, smooth_rate, threshold=0.07):
     global max
     dirivative_data = smooth_data(get_dirivative(smoothed_data), smooth_rate)
     under = []
@@ -201,10 +201,15 @@ def process_dirivative(smoothed_data, smooth_rate, threshold=0.1):
             end = i - 1
             # 筛除一些噪音段
             # if end >= start and end - start < 30 and max(map(get_abs, over[start:end + 1])) < 0.5:
-            if end >= start and end - start < 30:
+            if end >= start and end - start < 25:
                 for n in range(start, end + 1):
                     to_change.append(n)
                 end = -1
+        if i == len(over) - 1 and i - start < 25:
+            for n in range(start, len(over)):
+                to_change.append(n)
+            end = -1
+
     for n in to_change:
         under[n] = over[n]
         over[n] = None
@@ -337,12 +342,16 @@ def get_action_time(over, key):
 
         if i == len(over) - 1 and start != 0:
             time.append((round((len(over) - start) / 30.0, 3), start, len(over)))
-    max = 0
+    max_time = 0
     max_id = -1
     for i in range(0, len(time)):
-        if time[i][0] > max:
+        if time[i][0] > max_time:
             max_id = i
-    action_time = "{},{},{}".format(time[max_id][0], time[max_id][1], time[max_id][2])
+            max_time = time[i][0]
+    if max_id != -1:
+        action_time = "{},{},{}".format(time[max_id][0], time[max_id][1], time[max_id][2])
+    else:
+        action_time = "None"
     return action_time
 
 # # set base paths

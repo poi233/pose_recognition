@@ -1,11 +1,12 @@
 import json
 import utils
 import os
-import process_and_save
+from process_and_save import save_action_time
 
 # get json files to result_json
 result_json = {}
-json_path = os.path.join('result', '{}/json'.format('example_1_result'))
+video_name = 'IMG_4180'
+json_path = os.path.join('result', '{}_result/json'.format(video_name))
 json_file = os.listdir(json_path)[0]
 with open(os.path.join(json_path, json_file), 'r') as json_file:
     json_data = json.load(json_file)
@@ -19,4 +20,4 @@ with open(os.path.join(json_path, json_file), 'r') as json_file:
         json_data[human_id]['avg_knee'] = avg_knee
         json_data[human_id]['avg'] = avg
 
-process_and_save.save_action_time('example_1', json_data, smooth_rate=0.1, threshold=0.1)
+save_action_time(video_name, json_data, smooth_rate=0.1, threshold=0.07)
